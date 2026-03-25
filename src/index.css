@@ -1,0 +1,33 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  /* CodeX Brand Colors */
+  --color-brand-blue: #4E89BD;
+  --color-brand-blue-hover: #3d6e98;
+  --color-brand-blue-pale: #e8f2f9;
+  --color-brand-blue-light: #61AFEE;
+  --color-brand-red: #E06C75;
+  --color-brand-red-dark: #AD545B;
+  --color-brand-bg: #fffcf9;
+  --color-brand-dark: #1e293b;
+
+  /* Status colors */
+  --color-brand-success: #16a34a;
+  --color-brand-warning: #d97706;
+  --color-brand-danger: #dc2626;
+
+  --radius-lg: 0.625rem;
+  --radius-md: calc(var(--radius-lg) - 2px);
+  --radius-sm: calc(var(--radius-lg) - 4px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #fffcf9;
+  color: #1e293b;
+}
