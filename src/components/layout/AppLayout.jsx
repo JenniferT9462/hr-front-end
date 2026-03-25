@@ -7,15 +7,13 @@ export default function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
-    <div className="flex h-screen overflow-hidden bg-brand-bg">
-      <Sidebar
-        collapsed={!sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-      />
+    <div className={sidebarOpen ? 'sidebar-open' : ''}>
+      <Sidebar onClose={() => setSidebarOpen(false)} />
+      <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
 
-      <div className="flex flex-1 flex-col overflow-hidden lg:ml-0">
+      <div className="app-body">
         <TopBar onMenuToggle={() => setSidebarOpen((prev) => !prev)} />
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+        <main className="main">
           <Outlet />
         </main>
       </div>

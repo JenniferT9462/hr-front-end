@@ -1,60 +1,12 @@
-import { cn } from '@/lib/utils'
-
-export function Table({ className, ...props }) {
+export function Table({ className = '', ...props }) {
   return (
-    <div className="w-full overflow-auto">
-      <table
-        className={cn('w-full caption-bottom text-sm', className)}
-        {...props}
-      />
+    <div style={{ width: '100%', overflowX: 'auto' }}>
+      <table className={`table ${className}`} {...props} />
     </div>
   )
 }
-
-export function TableHeader({ className, ...props }) {
-  return (
-    <thead className={cn('[&_tr]:border-b', className)} {...props} />
-  )
-}
-
-export function TableBody({ className, ...props }) {
-  return (
-    <tbody
-      className={cn('[&_tr:last-child]:border-0', className)}
-      {...props}
-    />
-  )
-}
-
-export function TableRow({ className, ...props }) {
-  return (
-    <tr
-      className={cn(
-        'border-b border-slate-100 transition-colors hover:bg-slate-50',
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-export function TableHead({ className, ...props }) {
-  return (
-    <th
-      className={cn(
-        'h-10 px-4 text-left align-middle font-medium text-slate-500 text-xs uppercase tracking-wide',
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-export function TableCell({ className, ...props }) {
-  return (
-    <td
-      className={cn('px-4 py-3 align-middle text-slate-700', className)}
-      {...props}
-    />
-  )
-}
+export function TableHeader(props)                      { return <thead {...props} /> }
+export function TableBody(props)                        { return <tbody {...props} /> }
+export function TableRow({ className = '', ...props })  { return <tr className={className} {...props} /> }
+export function TableHead({ className = '', ...props }) { return <th className={className} {...props} /> }
+export function TableCell({ className = '', ...props }) { return <td className={className} {...props} /> }

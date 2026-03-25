@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, Pencil, Trash2, Star } from 'lucide-react'
+import { Plus, Pencil, Trash2, Star, TrendingUp } from 'lucide-react'
 import Swal from 'sweetalert2'
 import performanceService from '@/services/performanceService'
 import employeeService from '@/services/employeeService'
@@ -23,16 +23,13 @@ const RATING_COLORS = {
 }
 
 function RatingStars({ rating }) {
-  if (!rating) return <span className="text-slate-400">—</span>
+  if (!rating) return <span style={{color:'#94a3b8'}}>—</span>
   return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((n) => (
-        <Star
-          key={n}
-          className={`h-3.5 w-3.5 ${n <= rating ? 'text-yellow-400 fill-yellow-400' : 'text-slate-200'}`}
-        />
+    <div style={{display:'flex',alignItems:'center',gap:'2px'}}>
+      {[1,2,3,4,5].map(n => (
+        <Star key={n} size={13} style={{color: n <= rating ? '#facc15' : '#e2e8f0', fill: n <= rating ? '#facc15' : 'none'}} />
       ))}
-      <span className="ml-1 text-xs text-slate-500">{rating}/5</span>
+      <span style={{marginLeft:'4px',fontSize:'12px',color:'#64748b'}}>{rating}/5</span>
     </div>
   )
 }
@@ -120,16 +117,24 @@ export default function PerformancePage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">{reviews.length} record{reviews.length !== 1 ? 's' : ''}</p>
+    <div className="page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon icon-rose">
+            <TrendingUp strokeWidth={2} />
+          </div>
+          <div>
+            <h2 className="page-title">Performance Reviews</h2>
+            <p className="page-subtitle">{reviews.length} record{reviews.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
         <Button onClick={openNew} size="sm">
           <Plus className="h-4 w-4 mr-1" /> New Review
         </Button>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SpinnerOverlay />
           ) : (
@@ -147,14 +152,18 @@ export default function PerformancePage() {
               <TableBody>
                 {reviews.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-slate-400 py-8">
-                      No performance reviews found.
+                    <TableCell colSpan={6}>
+                      <div className="empty-state">
+                        <TrendingUp strokeWidth={1.5} />
+                        <p className="empty-state-title">No reviews yet</p>
+                        <p className="empty-state-desc">Start tracking employee performance with reviews</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   reviews.map((rev) => (
                     <TableRow key={rev.id}>
-                      <TableCell className="font-medium">{rev.employee_name || '—'}</TableCell>
+                      <TableCell>{rev.employee_name || '—'}</TableCell>
                       <TableCell>{rev.reviewer_name || '—'}</TableCell>
                       <TableCell>
                         {rev.review_type
@@ -164,7 +173,7 @@ export default function PerformancePage() {
                       <TableCell>{rev.review_date || '—'}</TableCell>
                       <TableCell><RatingStars rating={rev.overall_rating} /></TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="row-actions">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(rev)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -189,12 +198,12 @@ export default function PerformancePage() {
         onSubmit={handleSubmit(onSubmit)}
         loading={saving}
       >
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Employee *</Label>
             <select
               {...register('employee', { required: 'Required' })}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               <option value="">— Select Employee —</option>
               {employees.map(e => (
@@ -203,13 +212,13 @@ export default function PerformancePage() {
                 </option>
               ))}
             </select>
-            {errors.employee && <p className="text-xs text-red-600">{errors.employee.message}</p>}
+            {errors.employee && <p className="form-error">{errors.employee.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Reviewer (Employee)</Label>
             <select
               {...register('reviewer')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               <option value="">— None —</option>
               {employees.map(e => (
@@ -220,26 +229,26 @@ export default function PerformancePage() {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Review Type *</Label>
             <select
               {...register('review_type', { required: 'Required' })}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {REVIEW_TYPES.map(t => (
                 <option key={t} value={t}>{t.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>
               ))}
             </select>
-            {errors.review_type && <p className="text-xs text-red-600">{errors.review_type.message}</p>}
+            {errors.review_type && <p className="form-error">{errors.review_type.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Review Date *</Label>
             <Input type="date" {...register('review_date', { required: 'Required' })} />
-            {errors.review_date && <p className="text-xs text-red-600">{errors.review_date.message}</p>}
+            {errors.review_date && <p className="form-error">{errors.review_date.message}</p>}
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Overall Rating (1–5)</Label>
           <Input
             type="number"
@@ -251,24 +260,24 @@ export default function PerformancePage() {
             })}
             placeholder="e.g. 4"
           />
-          {errors.overall_rating && <p className="text-xs text-red-600">{errors.overall_rating.message}</p>}
+          {errors.overall_rating && <p className="form-error">{errors.overall_rating.message}</p>}
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Goals</Label>
           <textarea
             {...register('goals')}
             rows={2}
             placeholder="Goals for next period..."
-            className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
+            className="form-textarea"
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Comments</Label>
           <textarea
             {...register('comments')}
             rows={3}
             placeholder="General comments..."
-            className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
+            className="form-textarea"
           />
         </div>
       </FormModal>

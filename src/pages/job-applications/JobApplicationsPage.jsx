@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, Pencil, Trash2, ArrowRight } from 'lucide-react'
+import { Plus, Pencil, Trash2, ArrowRight, FileText } from 'lucide-react'
 import Swal from 'sweetalert2'
 import jobApplicationService from '@/services/jobApplicationService'
 import jobService from '@/services/jobService'
@@ -133,16 +133,24 @@ export default function JobApplicationsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">{applications.length} record{applications.length !== 1 ? 's' : ''}</p>
+    <div className="page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon icon-blue">
+            <FileText strokeWidth={2} />
+          </div>
+          <div>
+            <h2 className="page-title">Job Applications</h2>
+            <p className="page-subtitle">{applications.length} record{applications.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
         <Button onClick={openNew} size="sm">
           <Plus className="h-4 w-4 mr-1" /> New Application
         </Button>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SpinnerOverlay />
           ) : (
@@ -159,14 +167,18 @@ export default function JobApplicationsPage() {
               <TableBody>
                 {applications.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-slate-400 py-8">
-                      No applications found.
+                    <TableCell colSpan={5}>
+                      <div className="empty-state">
+                        <FileText strokeWidth={1.5} />
+                        <p className="empty-state-title">No applications yet</p>
+                        <p className="empty-state-desc">Applications will appear here as candidates apply</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   applications.map((app) => (
                     <TableRow key={app.id}>
-                      <TableCell className="font-medium">{app.applicant_name || '—'}</TableCell>
+                      <TableCell>{app.applicant_name || '—'}</TableCell>
                       <TableCell>{app.job_title || '—'}</TableCell>
                       <TableCell>
                         <Badge variant={STAGE_COLORS[app.stage] || 'default'}>
@@ -175,7 +187,7 @@ export default function JobApplicationsPage() {
                       </TableCell>
                       <TableCell>{formatDate(app.stage_updated_at)}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="row-actions">
                           <Button
                             variant="outline"
                             size="sm"
@@ -208,11 +220,11 @@ export default function JobApplicationsPage() {
         onSubmit={handleSubmit(onSubmit)}
         loading={saving}
       >
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Applicant *</Label>
           <select
             {...register('applicant', { required: 'Required' })}
-            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+            className="form-select"
           >
             <option value="">— Select Applicant —</option>
             {applicants.map(a => (
@@ -221,39 +233,39 @@ export default function JobApplicationsPage() {
               </option>
             ))}
           </select>
-          {errors.applicant && <p className="text-xs text-red-600">{errors.applicant.message}</p>}
+          {errors.applicant && <p className="form-error">{errors.applicant.message}</p>}
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Job *</Label>
           <select
             {...register('job', { required: 'Required' })}
-            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+            className="form-select"
           >
             <option value="">— Select Job —</option>
             {jobs.map(j => (
               <option key={j.id} value={j.id}>{j.title}</option>
             ))}
           </select>
-          {errors.job && <p className="text-xs text-red-600">{errors.job.message}</p>}
+          {errors.job && <p className="form-error">{errors.job.message}</p>}
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Stage</Label>
           <select
             {...register('stage')}
-            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+            className="form-select"
           >
             {Object.keys(STAGE_COLORS).map(s => (
               <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
             ))}
           </select>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Cover Letter</Label>
           <textarea
             {...register('cover_letter')}
             rows={4}
             placeholder="Cover letter text..."
-            className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
+            className="form-textarea"
           />
         </div>
       </FormModal>

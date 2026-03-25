@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, ClipboardList } from 'lucide-react'
 import Swal from 'sweetalert2'
 import jobService from '@/services/jobService'
 import positionService from '@/services/positionService'
@@ -13,8 +13,8 @@ import { Card, CardContent } from '@/components/ui/card'
 import { SpinnerOverlay } from '@/components/ui/spinner'
 import FormModal from '@/components/common/FormModal'
 
-const JOB_TYPES = ['full_time', 'part_time', 'contractor', 'internship']
-const JOB_STATUSES = ['open', 'closed', 'paused']
+const JOB_TYPES = ['full_time', 'part_time', 'contract', 'intern', 'temporary']
+const JOB_STATUSES = ['open', 'in_process', 'paused', 'cancelled', 'closed']
 
 export default function JobsPage() {
   const [jobs, setJobs] = useState([])
@@ -49,8 +49,8 @@ export default function JobsPage() {
     setEditing(job)
     reset({
       title: job.title,
-      position: job.position,
-      company: job.company,
+      position_ref: job.position_ref,
+      company_name: job.company_name,
       is_internal: job.is_internal,
       job_type: job.job_type,
       status: job.status,
@@ -101,16 +101,24 @@ export default function JobsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">{jobs.length} record{jobs.length !== 1 ? 's' : ''}</p>
+    <div className="page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon icon-blue">
+            <ClipboardList strokeWidth={2} />
+          </div>
+          <div>
+            <h2 className="page-title">Jobs</h2>
+            <p className="page-subtitle">{jobs.length} record{jobs.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
         <Button onClick={openNew} size="sm">
           <Plus className="h-4 w-4 mr-1" /> New Job
         </Button>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SpinnerOverlay />
           ) : (
@@ -130,22 +138,26 @@ export default function JobsPage() {
               <TableBody>
                 {jobs.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-slate-400 py-8">
-                      No jobs found.
+                    <TableCell colSpan={8}>
+                      <div className="empty-state">
+                        <ClipboardList strokeWidth={1.5} />
+                        <p className="empty-state-title">No job postings yet</p>
+                        <p className="empty-state-desc">Post your first job opening to start recruiting</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   jobs.map((job) => (
                     <TableRow key={job.id}>
-                      <TableCell className="font-medium">{job.title}</TableCell>
+                      <TableCell>{job.title}</TableCell>
                       <TableCell>{job.position_display || job.position_title || '—'}</TableCell>
                       <TableCell>{job.display_company || job.company || '—'}</TableCell>
-                      <TableCell><StatusBadge status={job.is_internal ? 'active' : 'inactive'} /></TableCell>
+                      <TableCell>{job.is_internal ? 'Yes' : 'No'}</TableCell>
                       <TableCell>{job.job_type?.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()) || '—'}</TableCell>
                       <TableCell><StatusBadge status={job.status} /></TableCell>
                       <TableCell>{job.application_count ?? '—'}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="row-actions">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(job)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -170,17 +182,17 @@ export default function JobsPage() {
         onSubmit={handleSubmit(onSubmit)}
         loading={saving}
       >
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Title *</Label>
           <Input {...register('title', { required: 'Required' })} placeholder="Senior Developer" />
-          {errors.title && <p className="text-xs text-red-600">{errors.title.message}</p>}
+          {errors.title && <p className="form-error">{errors.title.message}</p>}
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Position</Label>
             <select
-              {...register('position')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              {...register('position_ref')}
+              className="form-select"
             >
               <option value="">— None —</option>
               {positions.map(p => (
@@ -188,28 +200,28 @@ export default function JobsPage() {
               ))}
             </select>
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Company</Label>
-            <Input {...register('company')} placeholder="Acme Corp" />
+            <Input {...register('company_name')} placeholder="Acme Corp" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Job Type</Label>
             <select
               {...register('job_type')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {JOB_TYPES.map(t => (
                 <option key={t} value={t}>{t.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>
               ))}
             </select>
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Status</Label>
             <select
               {...register('status')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {JOB_STATUSES.map(s => (
                 <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -217,26 +229,26 @@ export default function JobsPage() {
             </select>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="form-check">
           <input type="checkbox" id="is_internal" {...register('is_internal')} className="h-4 w-4" />
           <Label htmlFor="is_internal">Internal posting only</Label>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Description</Label>
           <textarea
             {...register('description')}
             rows={3}
             placeholder="Job description..."
-            className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
+            className="form-textarea"
           />
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Requirements</Label>
           <textarea
             {...register('requirements')}
             rows={3}
             placeholder="Requirements..."
-            className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
+            className="form-textarea"
           />
         </div>
       </FormModal>

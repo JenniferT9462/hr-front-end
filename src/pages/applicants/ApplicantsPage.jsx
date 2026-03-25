@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, Pencil, Trash2, Check, X } from 'lucide-react'
+import { Plus, Pencil, Trash2, Check, X, UserSearch } from 'lucide-react'
 import Swal from 'sweetalert2'
 import applicantService from '@/services/applicantService'
 import { Button } from '@/components/ui/button'
@@ -91,20 +91,28 @@ export default function ApplicantsPage() {
 
   const BoolIcon = ({ value }) =>
     value
-      ? <Check className="h-4 w-4 text-green-600" />
-      : <X className="h-4 w-4 text-slate-300" />
+      ? <Check size={15} style={{color:'#16a34a'}} />
+      : <X size={15} style={{color:'#cbd5e1'}} />
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">{applicants.length} record{applicants.length !== 1 ? 's' : ''}</p>
+    <div className="page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon icon-blue">
+            <UserSearch strokeWidth={2} />
+          </div>
+          <div>
+            <h2 className="page-title">Applicants</h2>
+            <p className="page-subtitle">{applicants.length} record{applicants.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
         <Button onClick={openNew} size="sm">
           <Plus className="h-4 w-4 mr-1" /> New Applicant
         </Button>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SpinnerOverlay />
           ) : (
@@ -123,21 +131,25 @@ export default function ApplicantsPage() {
               <TableBody>
                 {applicants.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-slate-400 py-8">
-                      No applicants found.
+                    <TableCell colSpan={7}>
+                      <div className="empty-state">
+                        <UserSearch strokeWidth={1.5} />
+                        <p className="empty-state-title">No applicants yet</p>
+                        <p className="empty-state-desc">Add applicants to build your talent pool</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   applicants.map((app) => (
                     <TableRow key={app.id}>
-                      <TableCell className="font-medium">{app.full_name || `${app.first_name} ${app.last_name}`}</TableCell>
+                      <TableCell>{app.full_name || `${app.first_name} ${app.last_name}`}</TableCell>
                       <TableCell>{app.email}</TableCell>
                       <TableCell>{app.phone || '—'}</TableCell>
-                      <TableCell className="max-w-xs truncate text-slate-500">{app.headline || '—'}</TableCell>
+                      <TableCell>{app.headline || '—'}</TableCell>
                       <TableCell><BoolIcon value={app.has_cv} /></TableCell>
                       <TableCell><BoolIcon value={app.has_photo} /></TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="row-actions">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(app)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -162,34 +174,34 @@ export default function ApplicantsPage() {
         onSubmit={handleSubmit(onSubmit)}
         loading={saving}
       >
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>First Name *</Label>
             <Input {...register('first_name', { required: 'Required' })} placeholder="Jane" />
-            {errors.first_name && <p className="text-xs text-red-600">{errors.first_name.message}</p>}
+            {errors.first_name && <p className="form-error">{errors.first_name.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Last Name *</Label>
             <Input {...register('last_name', { required: 'Required' })} placeholder="Doe" />
-            {errors.last_name && <p className="text-xs text-red-600">{errors.last_name.message}</p>}
+            {errors.last_name && <p className="form-error">{errors.last_name.message}</p>}
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Email *</Label>
           <Input type="email" {...register('email', { required: 'Required' })} placeholder="jane.doe@example.com" />
-          {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
+          {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Phone</Label>
             <Input {...register('phone')} placeholder="+1 555 000 0000" />
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>LinkedIn URL</Label>
             <Input {...register('linkedin_url')} placeholder="https://linkedin.com/in/..." />
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Headline</Label>
           <Input {...register('headline')} placeholder="Software Engineer with 5 years experience" />
         </div>

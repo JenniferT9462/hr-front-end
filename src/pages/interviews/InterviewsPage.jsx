@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, Video } from 'lucide-react'
 import Swal from 'sweetalert2'
 import interviewService from '@/services/interviewService'
 import jobApplicationService from '@/services/jobApplicationService'
@@ -117,16 +117,24 @@ export default function InterviewsPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">{interviews.length} record{interviews.length !== 1 ? 's' : ''}</p>
+    <div className="page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon icon-rose">
+            <Video strokeWidth={2} />
+          </div>
+          <div>
+            <h2 className="page-title">Interviews</h2>
+            <p className="page-subtitle">{interviews.length} record{interviews.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
         <Button onClick={openNew} size="sm">
           <Plus className="h-4 w-4 mr-1" /> New Interview
         </Button>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SpinnerOverlay />
           ) : (
@@ -145,14 +153,18 @@ export default function InterviewsPage() {
               <TableBody>
                 {interviews.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-slate-400 py-8">
-                      No interviews found.
+                    <TableCell colSpan={7}>
+                      <div className="empty-state">
+                        <Video strokeWidth={1.5} />
+                        <p className="empty-state-title">No interviews scheduled</p>
+                        <p className="empty-state-desc">Schedule your first interview to get started</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   interviews.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.applicant_name || '—'}</TableCell>
+                      <TableCell>{item.applicant_name || '—'}</TableCell>
                       <TableCell>{item.job_title || '—'}</TableCell>
                       <TableCell>
                         {item.interview_type
@@ -169,7 +181,7 @@ export default function InterviewsPage() {
                         ) : '—'}
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="row-actions">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(item)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -194,11 +206,11 @@ export default function InterviewsPage() {
         onSubmit={handleSubmit(onSubmit)}
         loading={saving}
       >
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Job Application</Label>
           <select
             {...register('job_application')}
-            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+            className="form-select"
           >
             <option value="">— None —</option>
             {applications.map(a => (
@@ -208,24 +220,24 @@ export default function InterviewsPage() {
             ))}
           </select>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Interview Type *</Label>
             <select
               {...register('interview_type', { required: 'Required' })}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {INTERVIEW_TYPES.map(t => (
                 <option key={t} value={t}>{t.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>
               ))}
             </select>
-            {errors.interview_type && <p className="text-xs text-red-600">{errors.interview_type.message}</p>}
+            {errors.interview_type && <p className="form-error">{errors.interview_type.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Outcome</Label>
             <select
               {...register('outcome')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {OUTCOMES.map(o => (
                 <option key={o} value={o}>{o.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>
@@ -233,20 +245,20 @@ export default function InterviewsPage() {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Scheduled At *</Label>
             <Input
               type="datetime-local"
               {...register('scheduled_at', { required: 'Required' })}
             />
-            {errors.scheduled_at && <p className="text-xs text-red-600">{errors.scheduled_at.message}</p>}
+            {errors.scheduled_at && <p className="form-error">{errors.scheduled_at.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Interviewer (Employee)</Label>
             <select
               {...register('interviewer')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               <option value="">— None —</option>
               {employees.map(e => (
@@ -257,17 +269,17 @@ export default function InterviewsPage() {
             </select>
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Location / Link</Label>
           <Input {...register('location')} placeholder="Conference room A / Zoom link" />
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Notes</Label>
           <textarea
             {...register('notes')}
             rows={3}
             placeholder="Interview notes..."
-            className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
+            className="form-textarea"
           />
         </div>
       </FormModal>

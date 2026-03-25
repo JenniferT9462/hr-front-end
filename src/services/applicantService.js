@@ -10,7 +10,7 @@ const applicantService = {
   uploadPhoto: (id, file) => {
     const formData = new FormData()
     formData.append('photo', file)
-    return api.patch(`/applicants/${id}/`, formData, {
+    return api.post(`/applicants/${id}/upload-photo/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
@@ -18,13 +18,14 @@ const applicantService = {
   uploadCV: (id, file) => {
     const formData = new FormData()
     formData.append('cv', file)
-    return api.patch(`/applicants/${id}/`, formData, {
+    return api.post(`/applicants/${id}/upload-cv/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })
   },
 
+  // Returns { download_url, expires_in } — redirect user to download_url
   downloadCV: (id) =>
-    api.get(`/applicants/${id}/download_cv/`, { responseType: 'blob' }),
+    api.get(`/applicants/${id}/cv-download/`),
 }
 
 export default applicantService

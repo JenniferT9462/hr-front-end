@@ -6,8 +6,8 @@ const jobApplicationService = {
   create: (data) => api.post('/job-applications/', data),
   update: (id, data) => api.patch(`/job-applications/${id}/`, data),
   remove: (id) => api.delete(`/job-applications/${id}/`),
-  advanceStage: (id) => api.post(`/job-applications/${id}/advance_stage/`),
-  convertToEmployee: (id, data) => api.post(`/job-applications/${id}/convert_to_employee/`, data),
+  advanceStage: (id, data) => api.post(`/job-applications/${id}/advance-stage/`, data),
+  convertToEmployee: (id, data) => api.post(`/job-applications/${id}/convert-to-employee/`, data),
 }
 
 export default jobApplicationService

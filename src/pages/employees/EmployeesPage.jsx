@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, Users } from 'lucide-react'
 import Swal from 'sweetalert2'
 import employeeService from '@/services/employeeService'
 import positionService from '@/services/positionService'
@@ -108,16 +108,24 @@ export default function EmployeesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">{employees.length} record{employees.length !== 1 ? 's' : ''}</p>
+    <div className="page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon icon-blue">
+            <Users strokeWidth={2} />
+          </div>
+          <div>
+            <h2 className="page-title">Employees</h2>
+            <p className="page-subtitle">{employees.length} record{employees.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
         <Button onClick={openNew} size="sm">
           <Plus className="h-4 w-4 mr-1" /> New Employee
         </Button>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SpinnerOverlay />
           ) : (
@@ -137,15 +145,19 @@ export default function EmployeesPage() {
               <TableBody>
                 {employees.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center text-slate-400 py-8">
-                      No employees found.
+                    <TableCell colSpan={8}>
+                      <div className="empty-state">
+                        <Users strokeWidth={1.5} />
+                        <p className="empty-state-title">No employees yet</p>
+                        <p className="empty-state-desc">Add your first employee to get started</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   employees.map((emp) => (
                     <TableRow key={emp.id}>
-                      <TableCell className="font-mono text-xs">{emp.employee_code || '—'}</TableCell>
-                      <TableCell className="font-medium">{emp.full_name || `${emp.first_name} ${emp.last_name}`}</TableCell>
+                      <TableCell>{emp.employee_code || '—'}</TableCell>
+                      <TableCell>{emp.full_name || `${emp.first_name} ${emp.last_name}`}</TableCell>
                       <TableCell>{emp.email}</TableCell>
                       <TableCell>{emp.position_title || '—'}</TableCell>
                       <TableCell><StatusBadge status={emp.status} /></TableCell>
@@ -156,7 +168,7 @@ export default function EmployeesPage() {
                       </TableCell>
                       <TableCell>{emp.hire_date || '—'}</TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="row-actions">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(emp)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -181,50 +193,50 @@ export default function EmployeesPage() {
         onSubmit={handleSubmit(onSubmit)}
         loading={saving}
       >
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>First Name *</Label>
             <Input {...register('first_name', { required: 'Required' })} placeholder="Jane" />
-            {errors.first_name && <p className="text-xs text-red-600">{errors.first_name.message}</p>}
+            {errors.first_name && <p className="form-error">{errors.first_name.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Last Name *</Label>
             <Input {...register('last_name', { required: 'Required' })} placeholder="Doe" />
-            {errors.last_name && <p className="text-xs text-red-600">{errors.last_name.message}</p>}
+            {errors.last_name && <p className="form-error">{errors.last_name.message}</p>}
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Email *</Label>
           <Input type="email" {...register('email', { required: 'Required' })} placeholder="jane.doe@company.com" />
-          {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
+          {errors.email && <p className="form-error">{errors.email.message}</p>}
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Phone</Label>
             <Input {...register('phone')} placeholder="+1 555 000 0000" />
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Employee Code</Label>
             <Input {...register('employee_code')} placeholder="EMP-001" />
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Status</Label>
             <select
               {...register('status')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {STATUS_OPTIONS.map(s => (
                 <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
               ))}
             </select>
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Employment Type</Label>
             <select
               {...register('employment_type')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {EMPLOYMENT_TYPES.map(t => (
                 <option key={t} value={t}>{t.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>
@@ -232,12 +244,12 @@ export default function EmployeesPage() {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Position</Label>
             <select
               {...register('position')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               <option value="">— None —</option>
               {positions.map(p => (
@@ -245,7 +257,7 @@ export default function EmployeesPage() {
               ))}
             </select>
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Hire Date</Label>
             <Input type="date" {...register('hire_date')} />
           </div>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, Calendar } from 'lucide-react'
 import Swal from 'sweetalert2'
 import timeOffService from '@/services/timeOffService'
 import employeeService from '@/services/employeeService'
@@ -104,16 +104,24 @@ export default function TimeOffPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <p className="text-slate-500 text-sm">{requests.length} record{requests.length !== 1 ? 's' : ''}</p>
+    <div className="page">
+      <div className="page-header">
+        <div className="page-header-left">
+          <div className="page-header-icon icon-blue">
+            <Calendar strokeWidth={2} />
+          </div>
+          <div>
+            <h2 className="page-title">Time Off Requests</h2>
+            <p className="page-subtitle">{requests.length} record{requests.length !== 1 ? 's' : ''}</p>
+          </div>
+        </div>
         <Button onClick={openNew} size="sm">
           <Plus className="h-4 w-4 mr-1" /> New Request
         </Button>
       </div>
 
       <Card>
-        <CardContent className="p-0">
+        <CardContent>
           {loading ? (
             <SpinnerOverlay />
           ) : (
@@ -132,14 +140,18 @@ export default function TimeOffPage() {
               <TableBody>
                 {requests.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-slate-400 py-8">
-                      No time-off requests found.
+                    <TableCell colSpan={7}>
+                      <div className="empty-state">
+                        <Calendar strokeWidth={1.5} />
+                        <p className="empty-state-title">No time-off requests</p>
+                        <p className="empty-state-desc">Requests from employees will appear here</p>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ) : (
                   requests.map((req) => (
                     <TableRow key={req.id}>
-                      <TableCell className="font-medium">{req.employee_name || '—'}</TableCell>
+                      <TableCell>{req.employee_name || '—'}</TableCell>
                       <TableCell>
                         {req.leave_type
                           ? req.leave_type.charAt(0).toUpperCase() + req.leave_type.slice(1)
@@ -154,7 +166,7 @@ export default function TimeOffPage() {
                         </Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="row-actions">
                           <Button variant="ghost" size="icon" onClick={() => openEdit(req)}>
                             <Pencil className="h-4 w-4" />
                           </Button>
@@ -179,11 +191,11 @@ export default function TimeOffPage() {
         onSubmit={handleSubmit(onSubmit)}
         loading={saving}
       >
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Employee *</Label>
           <select
             {...register('employee', { required: 'Required' })}
-            className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+            className="form-select"
           >
             <option value="">— Select Employee —</option>
             {employees.map(e => (
@@ -192,26 +204,26 @@ export default function TimeOffPage() {
               </option>
             ))}
           </select>
-          {errors.employee && <p className="text-xs text-red-600">{errors.employee.message}</p>}
+          {errors.employee && <p className="form-error">{errors.employee.message}</p>}
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Leave Type *</Label>
             <select
               {...register('leave_type', { required: 'Required' })}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {LEAVE_TYPES.map(t => (
                 <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
               ))}
             </select>
-            {errors.leave_type && <p className="text-xs text-red-600">{errors.leave_type.message}</p>}
+            {errors.leave_type && <p className="form-error">{errors.leave_type.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>Status</Label>
             <select
               {...register('status')}
-              className="flex h-9 w-full rounded-md border border-slate-200 bg-white px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue"
+              className="form-select"
             >
               {STATUSES.map(s => (
                 <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -219,25 +231,25 @@ export default function TimeOffPage() {
             </select>
           </div>
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
+        <div className="form-grid-2">
+          <div className="form-group">
             <Label>Start Date *</Label>
             <Input type="date" {...register('start_date', { required: 'Required' })} />
-            {errors.start_date && <p className="text-xs text-red-600">{errors.start_date.message}</p>}
+            {errors.start_date && <p className="form-error">{errors.start_date.message}</p>}
           </div>
-          <div className="space-y-1.5">
+          <div className="form-group">
             <Label>End Date *</Label>
             <Input type="date" {...register('end_date', { required: 'Required' })} />
-            {errors.end_date && <p className="text-xs text-red-600">{errors.end_date.message}</p>}
+            {errors.end_date && <p className="form-error">{errors.end_date.message}</p>}
           </div>
         </div>
-        <div className="space-y-1.5">
+        <div className="form-group">
           <Label>Reason</Label>
           <textarea
             {...register('reason')}
             rows={3}
             placeholder="Reason for time off..."
-            className="flex w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue resize-none"
+            className="form-textarea"
           />
         </div>
       </FormModal>

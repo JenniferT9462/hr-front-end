@@ -2,11 +2,29 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import authService from '@/services/authService'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import Swal from 'sweetalert2'
+
+const fieldStyle = {
+  width: '100%',
+  height: '44px',
+  borderRadius: '10px',
+  border: '2px solid #e2e8f0',
+  padding: '0 14px',
+  fontSize: '15px',
+  color: '#1e293b',
+  background: '#f8fafc',
+  outline: 'none',
+  boxSizing: 'border-box',
+}
+
+const labelStyle = {
+  display: 'block',
+  fontSize: '14px',
+  fontWeight: '600',
+  color: '#374151',
+  marginBottom: '8px',
+}
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -29,9 +47,9 @@ export default function RegisterPage() {
       })
       navigate('/login')
     } catch (err) {
-      const data = err.response?.data
-      if (data && typeof data === 'object') {
-        const messages = Object.entries(data)
+      const resData = err.response?.data
+      if (resData && typeof resData === 'object') {
+        const messages = Object.entries(resData)
           .map(([key, val]) => `${key}: ${Array.isArray(val) ? val.join(', ') : val}`)
           .join('\n')
         setError(messages)
@@ -43,119 +61,140 @@ export default function RegisterPage() {
     }
   }
 
+  const field = (name, opts = {}) => ({
+    ...register(name, opts),
+    style: fieldStyle,
+    onFocus: e => (e.target.style.borderColor = '#4E89BD'),
+    onBlur: e => (e.target.style.borderColor = errors[name] ? '#dc2626' : '#e2e8f0'),
+  })
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-bg px-4 py-8">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="mx-auto h-12 w-12 rounded-xl bg-brand-blue flex items-center justify-center font-bold text-white text-lg mb-4">
-            HR
-          </div>
-          <h1 className="text-2xl font-bold text-brand-dark">Create Account</h1>
-          <p className="text-slate-500 mt-1">Register as an applicant</p>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'linear-gradient(135deg, #f1f5f9 0%, #e8f2f9 100%)',
+      padding: '24px',
+      fontFamily: "'Inter', system-ui, sans-serif",
+    }}>
+      <div style={{ width: '100%', maxWidth: '480px' }}>
+
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+          <div style={{
+            width: '52px', height: '52px', borderRadius: '14px',
+            background: 'linear-gradient(135deg, #4E89BD, #61AFEE)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: '700', color: 'white', fontSize: '17px',
+            margin: '0 auto 14px',
+            boxShadow: '0 6px 20px rgba(78,137,189,0.35)',
+          }}>HR</div>
+          <h1 style={{ fontSize: '26px', fontWeight: '800', color: '#1e293b', margin: '0 0 4px' }}>
+            Create Account
+          </h1>
+          <p style={{ color: '#64748b', fontSize: '14px', margin: 0 }}>Register as an applicant</p>
         </div>
 
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-8">
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Card */}
+        <div style={{
+          background: 'white', borderRadius: '20px',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.10)', padding: '32px',
+          border: '1px solid rgba(78,137,189,0.12)',
+        }}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+
             {error && (
-              <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700 whitespace-pre-line">
-                {error}
-              </div>
+              <div style={{
+                background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px',
+                padding: '12px 16px', marginBottom: '20px', color: '#dc2626',
+                fontSize: '14px', whiteSpace: 'pre-line',
+              }}>{error}</div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="first_name">First Name</Label>
-                <Input
-                  id="first_name"
-                  placeholder="Jane"
-                  {...register('first_name', { required: 'Required' })}
-                />
-                {errors.first_name && <p className="text-xs text-red-600">{errors.first_name.message}</p>}
+            {/* First + Last name row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+              <div>
+                <label style={labelStyle}>First Name</label>
+                <input placeholder="Jane" {...field('first_name', { required: 'Required' })} />
+                {errors.first_name && <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.first_name.message}</p>}
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="last_name">Last Name</Label>
-                <Input
-                  id="last_name"
-                  placeholder="Doe"
-                  {...register('last_name', { required: 'Required' })}
-                />
-                {errors.last_name && <p className="text-xs text-red-600">{errors.last_name.message}</p>}
+              <div>
+                <label style={labelStyle}>Last Name</label>
+                <input placeholder="Doe" {...field('last_name', { required: 'Required' })} />
+                {errors.last_name && <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.last_name.message}</p>}
               </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                placeholder="jdoe"
-                {...register('username', { required: 'Username is required' })}
-              />
-              {errors.username && <p className="text-xs text-red-600">{errors.username.message}</p>}
+            {/* Username */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={labelStyle}>Username</label>
+              <input placeholder="jdoe" {...field('username', { required: 'Username is required' })} />
+              {errors.username && <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.username.message}</p>}
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="jane.doe@example.com"
-                {...register('email', {
+            {/* Email */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={labelStyle}>Email</label>
+              <input type="email" placeholder="jane.doe@example.com"
+                {...field('email', {
                   required: 'Email is required',
                   pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' }
-                })}
-              />
-              {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
+                })} />
+              {errors.email && <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.email.message}</p>}
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone (optional)</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+1 555 000 0000"
-                {...register('phone')}
-              />
+            {/* Phone */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={labelStyle}>Phone <span style={{ fontWeight: 400, color: '#94a3b8' }}>(optional)</span></label>
+              <input type="tel" placeholder="+1 555 000 0000" {...field('phone')} />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Minimum 8 characters"
-                {...register('password', {
-                  required: 'Password is required',
-                  minLength: { value: 8, message: 'Minimum 8 characters' }
-                })}
-              />
-              {errors.password && <p className="text-xs text-red-600">{errors.password.message}</p>}
+            {/* Password row */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '28px' }}>
+              <div>
+                <label style={labelStyle}>Password</label>
+                <input type="password" placeholder="Min. 8 characters"
+                  {...field('password', {
+                    required: 'Password is required',
+                    minLength: { value: 8, message: 'Min 8 characters' }
+                  })} />
+                {errors.password && <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.password.message}</p>}
+              </div>
+              <div>
+                <label style={labelStyle}>Confirm Password</label>
+                <input type="password" placeholder="Repeat password"
+                  {...field('password_confirm', {
+                    required: 'Required',
+                    validate: val => val === password || 'Passwords do not match',
+                  })} />
+                {errors.password_confirm && <p style={{ color: '#dc2626', fontSize: '12px', marginTop: '4px' }}>{errors.password_confirm.message}</p>}
+              </div>
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="password_confirm">Confirm Password</Label>
-              <Input
-                id="password_confirm"
-                type="password"
-                placeholder="Repeat password"
-                {...register('password_confirm', {
-                  required: 'Please confirm your password',
-                  validate: (val) => val === password || 'Passwords do not match',
-                })}
-              />
-              {errors.password_confirm && <p className="text-xs text-red-600">{errors.password_confirm.message}</p>}
-            </div>
-
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <><Spinner size="sm" className="mr-2" /> Creating account...</> : 'Create Account'}
-            </Button>
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%', height: '48px', borderRadius: '12px',
+                background: loading ? '#93b8d8' : 'linear-gradient(135deg, #4E89BD, #61AFEE)',
+                color: 'white', fontWeight: '700', fontSize: '16px',
+                border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
+                boxShadow: loading ? 'none' : '0 4px 16px rgba(78,137,189,0.40)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
+              }}
+            >
+              {loading ? <><Spinner size="sm" /> Creating account...</> : 'Create Account'}
+            </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-slate-500">
+          <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#64748b' }}>
             Already have an account?{' '}
-            <Link to="/login" className="text-brand-blue font-medium hover:underline">
+            <Link to="/login" style={{ color: '#4E89BD', fontWeight: '700', textDecoration: 'none' }}>
               Sign in
             </Link>
-          </div>
+          </p>
         </div>
       </div>
     </div>
