@@ -1,5 +1,91 @@
-import React from 'react'
-import { SectionHeading } from './SectionHeading'
+import React from "react";
+import { SectionHeading } from "./SectionHeading";
+
+const ExperienceForm = ({
+  form,
+  onChange,
+  onSave,
+  onCancel,
+  error,
+  saving,
+  saveLabel,
+}) => (
+  <div className="cxprofile-exp-form">
+    <div className="cxprofile-form-grid">
+      {[
+        { label: "Company", field: "company", type: "text" },
+        { label: "Title", field: "title", type: "text" },
+        { label: "Location", field: "location", type: "text" },
+        { label: "Start date", field: "start_date", type: "date" },
+      ].map(({ label, field, type }) => (
+        <label key={field} className="cxprofile-form-label">
+          {label}
+          <input
+            type={type}
+            value={form[field]}
+            onChange={(e) => onChange(field, e.target.value)}
+            className="cxprofile-input"
+          />
+        </label>
+      ))}
+
+      <label className="cxprofile-form-label">
+        End date
+        <input
+          type="date"
+          value={form.end_date}
+          onChange={(e) => onChange("end_date", e.target.value)}
+          disabled={form.is_current}
+          className="cxprofile-input"
+        />
+      </label>
+
+      <label className="cxprofile-form-label cxprofile-form-label--checkbox">
+        <input
+          type="checkbox"
+          checked={form.is_current}
+          onChange={(e) => onChange("is_current", e.target.checked)}
+          className="cxprofile-checkbox"
+        />
+        Current role
+      </label>
+
+      <label className="cxprofile-form-label cxprofile-form-label--full">
+        Description
+        <textarea
+          rows={4}
+          value={form.description}
+          onChange={(e) => onChange("description", e.target.value)}
+          className="cxprofile-input cxprofile-input--textarea"
+        />
+      </label>
+    </div>
+
+    {error && (
+      <p className="cxprofile-notice--error" style={{ marginTop: 12 }}>
+        {error}
+      </p>
+    )}
+
+    <div className="cxprofile-exp-form-actions">
+      <button
+        type="button"
+        onClick={onSave}
+        disabled={saving}
+        className="codexhub-btn codexhub-btn--blue"
+      >
+        {saving ? "Saving…" : saveLabel}
+      </button>
+      <button
+        type="button"
+        onClick={onCancel}
+        className="codexhub-btn codexhub-btn--ghost"
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+);
 
 export const WorkExperienceSection = ({
   workExperiences,
@@ -20,165 +106,70 @@ export const WorkExperienceSection = ({
   onEditCancel,
   onDelete,
 }) => (
-  <section className="codexhub-card rounded-2xl border border-slate-100 bg-white p-8 shadow-sm">
-    <div className="flex flex-wrap items-center justify-between gap-4">
+  <section className="cxprofile-card">
+    <div className="cxprofile-section-row">
       <SectionHeading label="Work Experience" />
       <button
+        type="button"
         onClick={onAddClick}
-        className="codexhub-btn rounded-lg border border-brand-blue/30 px-4 py-2 text-sm font-semibold text-brand-blue transition hover:border-brand-red/50 hover:bg-brand-red/10 hover:text-brand-red"
+        className="codexhub-btn codexhub-btn--ghost"
+        style={{ padding: "8px 16px", fontSize: 13 }}
       >
-        Add experience
+        + Add experience
       </button>
     </div>
 
-    {experienceToast && (
-      <p className="mb-4 text-sm text-emerald-600">{experienceToast}</p>
-    )}
+    {experienceToast && <p className="cxprofile-toast">{experienceToast}</p>}
 
     {workExperiences.length ? (
-      <div className="space-y-4">
+      <div className="cxprofile-exp-list">
         {workExperiences.map((item) => (
-          <div
-            key={item.id}
-            className="rounded-xl border border-slate-100 p-5"
-          >
+          <div key={item.id} className="cxprofile-exp-item">
             {editingExperienceId === item.id && editingExperience ? (
-              <>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <label className="text-sm font-medium text-slate-700">
-                    Company
-                    <input
-                      value={editingExperience.company}
-                      onChange={(event) =>
-                        onEditChange('company', event.target.value)
-                      }
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-                    />
-                  </label>
-                  <label className="text-sm font-medium text-slate-700">
-                    Title
-                    <input
-                      value={editingExperience.title}
-                      onChange={(event) =>
-                        onEditChange('title', event.target.value)
-                      }
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-                    />
-                  </label>
-                  <label className="text-sm font-medium text-slate-700">
-                    Location
-                    <input
-                      value={editingExperience.location}
-                      onChange={(event) =>
-                        onEditChange('location', event.target.value)
-                      }
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-                    />
-                  </label>
-                  <label className="text-sm font-medium text-slate-700">
-                    Start date
-                    <input
-                      type="date"
-                      value={editingExperience.start_date}
-                      onChange={(event) =>
-                        onEditChange('start_date', event.target.value)
-                      }
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-                    />
-                  </label>
-                  <label className="text-sm font-medium text-slate-700">
-                    End date
-                    <input
-                      type="date"
-                      value={editingExperience.end_date}
-                      onChange={(event) =>
-                        onEditChange('end_date', event.target.value)
-                      }
-                      disabled={editingExperience.is_current}
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-                    />
-                  </label>
-                  <label className="text-sm font-medium text-slate-700">
-                    <span className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        checked={editingExperience.is_current}
-                        onChange={(event) =>
-                          onEditChange('is_current', event.target.checked)
-                        }
-                      />
-                      Current role
-                    </span>
-                  </label>
-                  <label className="text-sm font-medium text-slate-700 md:col-span-2">
-                    Description
-                    <textarea
-                      rows={4}
-                      value={editingExperience.description}
-                      onChange={(event) =>
-                        onEditChange('description', event.target.value)
-                      }
-                      className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-                    />
-                  </label>
-                </div>
-
-                {experienceError && (
-                  <p className="mt-3 text-sm text-rose-500">{experienceError}</p>
-                )}
-
-                <div className="mt-4 flex flex-wrap gap-3">
-                  <button
-                    onClick={onEditSave}
-                    disabled={experienceSaving}
-                    className="rounded-lg bg-brand-blue px-6 py-3 font-semibold text-white transition hover:bg-brand-red disabled:cursor-not-allowed disabled:opacity-70"
-                  >
-                    {experienceSaving ? 'Saving...' : 'Save changes'}
-                  </button>
-                  <button
-                    onClick={onEditCancel}
-                    className="rounded-lg border border-slate-200/80 px-6 py-3 font-semibold text-slate-600 transition hover:border-brand-red/40 hover:bg-rose-50 hover:text-brand-red"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </>
+              <ExperienceForm
+                form={editingExperience}
+                onChange={onEditChange}
+                onSave={onEditSave}
+                onCancel={onEditCancel}
+                error={experienceError}
+                saving={experienceSaving}
+                saveLabel="Save changes"
+              />
             ) : (
               <>
-                <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="cxprofile-exp-header">
                   <div>
-                    <h3 className="text-lg font-bold text-brand-blue">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-slate-600">
+                    <h3 className="cxprofile-exp-title">{item.title}</h3>
+                    <p className="cxprofile-exp-company">
                       {item.company}
-                      {item.location ? ` • ${item.location}` : ''}
+                      {item.location ? ` · ${item.location}` : ""}
                     </p>
                   </div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                  <p className="cxprofile-exp-dates">
                     {item.start_date}
                     {item.is_current
-                      ? ' - Present'
+                      ? " – Present"
                       : item.end_date
-                        ? ` - ${item.end_date}`
-                        : ''}
+                        ? ` – ${item.end_date}`
+                        : ""}
                   </p>
                 </div>
                 {item.description && (
-                  <p className="mt-3 text-sm text-slate-600">
-                    {item.description}
-                  </p>
+                  <p className="cxprofile-exp-desc">{item.description}</p>
                 )}
-                <div className="mt-4 flex flex-wrap gap-3">
+                <div className="cxprofile-exp-actions">
                   <button
+                    type="button"
                     onClick={() => onEditStart(item)}
-                    className="rounded-lg border border-brand-blue/30 px-4 py-2 text-sm font-semibold text-brand-blue transition hover:border-brand-red/50 hover:bg-brand-red/10 hover:text-brand-red"
+                    className="codexhub-btn codexhub-btn--ghost"
+                    style={{ padding: "7px 14px", fontSize: 13 }}
                   >
                     Edit
                   </button>
                   <button
+                    type="button"
                     onClick={() => onDelete(item.id)}
-                    className="rounded-lg border border-rose-200 px-4 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50"
+                    className="cxprofile-btn--danger"
                   >
                     Delete
                   </button>
@@ -189,112 +180,21 @@ export const WorkExperienceSection = ({
         ))}
       </div>
     ) : (
-      <p className="text-sm text-slate-500">
+      <p className="cxprofile-muted">
         Add your work history to help employers get the full picture.
       </p>
     )}
 
     {isAdding && (
-      <div className="mt-6 rounded-2xl border border-brand-blue/20 bg-white p-5 shadow-sm">
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="text-sm font-medium text-slate-700">
-            Company
-            <input
-              value={experienceForm.company}
-              onChange={(event) =>
-                onExperienceChange('company', event.target.value)
-              }
-              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-            />
-          </label>
-          <label className="text-sm font-medium text-slate-700">
-            Title
-            <input
-              value={experienceForm.title}
-              onChange={(event) =>
-                onExperienceChange('title', event.target.value)
-              }
-              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-            />
-          </label>
-          <label className="text-sm font-medium text-slate-700">
-            Location
-            <input
-              value={experienceForm.location}
-              onChange={(event) =>
-                onExperienceChange('location', event.target.value)
-              }
-              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-            />
-          </label>
-          <label className="text-sm font-medium text-slate-700">
-            Start date
-            <input
-              type="date"
-              value={experienceForm.start_date}
-              onChange={(event) =>
-                onExperienceChange('start_date', event.target.value)
-              }
-              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-            />
-          </label>
-          <label className="text-sm font-medium text-slate-700">
-            End date
-            <input
-              type="date"
-              value={experienceForm.end_date}
-              onChange={(event) =>
-                onExperienceChange('end_date', event.target.value)
-              }
-              disabled={experienceForm.is_current}
-              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20 disabled:cursor-not-allowed disabled:bg-slate-100"
-            />
-          </label>
-          <label className="text-sm font-medium text-slate-700">
-            <span className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={experienceForm.is_current}
-                onChange={(event) =>
-                  onExperienceChange('is_current', event.target.checked)
-                }
-              />
-              Current role
-            </span>
-          </label>
-          <label className="text-sm font-medium text-slate-700 md:col-span-2">
-            Description
-            <textarea
-              rows={4}
-              value={experienceForm.description}
-              onChange={(event) =>
-                onExperienceChange('description', event.target.value)
-              }
-              className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-blue focus:ring-2 focus:ring-brand-blue/20"
-            />
-          </label>
-        </div>
-
-        {experienceError && (
-          <p className="mt-3 text-sm text-rose-500">{experienceError}</p>
-        )}
-
-        <div className="mt-4 flex flex-wrap gap-3">
-          <button
-            onClick={onSaveNew}
-            disabled={experienceSaving}
-            className="rounded-lg bg-brand-blue px-6 py-3 font-semibold text-white transition hover:bg-brand-red disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {experienceSaving ? 'Saving...' : 'Save experience'}
-          </button>
-          <button
-            onClick={onCancelNew}
-            className="rounded-lg border border-slate-200/80 px-6 py-3 font-semibold text-slate-600 transition hover:border-brand-red/40 hover:bg-rose-50 hover:text-brand-red"
-          >
-            Cancel
-          </button>
-        </div>
-      </div>
+      <ExperienceForm
+        form={experienceForm}
+        onChange={onExperienceChange}
+        onSave={onSaveNew}
+        onCancel={onCancelNew}
+        error={experienceError}
+        saving={experienceSaving}
+        saveLabel="Save experience"
+      />
     )}
   </section>
-)
+);

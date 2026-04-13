@@ -1,5 +1,5 @@
-import React from 'react'
-import { SectionHeading } from './SectionHeading'
+import React from "react";
+import { SectionHeading } from "./SectionHeading";
 
 export const SkillsSection = ({
   skills,
@@ -16,31 +16,32 @@ export const SkillsSection = ({
   onEditSave,
   onEditCancel,
 }) => (
-  <section className="codexhub-card codexhub-profile-card">
+  <section className="cxprofile-card">
     <SectionHeading label="Technical Skills" />
-    <div className="codexhub-skill-list">
+
+    <div className="cxprofile-skill-list">
       {skills.map((skill) => (
-        <div key={skill.id} className="codexhub-skill-item">
+        <div key={skill.id} className="cxprofile-skill-item">
           <button
             type="button"
             onClick={() => onToggleMenu(skill.id)}
-            className="codexhub-skill-chip"
+            className="cxprofile-skill-chip"
           >
             {skill.name}
           </button>
           {skillMenuId === skill.id && (
-            <div className="codexhub-skill-menu">
+            <div className="cxprofile-skill-menu">
               <button
                 type="button"
                 onClick={() => onEditStart(skill)}
-                className="codexhub-skill-menu-btn"
+                className="cxprofile-skill-menu-btn"
               >
                 Edit
               </button>
               <button
                 type="button"
                 onClick={() => onDelete(skill.id)}
-                className="codexhub-skill-menu-btn danger"
+                className="cxprofile-skill-menu-btn cxprofile-skill-menu-btn--danger"
               >
                 Delete
               </button>
@@ -50,28 +51,29 @@ export const SkillsSection = ({
       ))}
     </div>
 
-    <div className="codexhub-form-row">
+    <div className="cxprofile-skill-add-row">
       <input
         value={newSkill}
-        onChange={(event) => onNewSkillChange(event.target.value)}
-        placeholder="Add a skill"
-        className="codexhub-input"
+        onChange={(e) => onNewSkillChange(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && onAddSkill()}
+        placeholder="Add a skill…"
+        className="cxprofile-input cxprofile-input--flex"
       />
       <button
         type="button"
         onClick={onAddSkill}
         className="codexhub-btn codexhub-btn--blue"
       >
-        Add skill
+        Add
       </button>
     </div>
 
     {editingSkillId && (
-      <div className="codexhub-form-row codexhub-form-row--compact">
+      <div className="cxprofile-skill-add-row" style={{ marginTop: 10 }}>
         <input
           value={editingSkillValue}
-          onChange={(event) => onEditValueChange(event.target.value)}
-          className="codexhub-input"
+          onChange={(e) => onEditValueChange(e.target.value)}
+          className="cxprofile-input cxprofile-input--flex"
         />
         <button
           type="button"
@@ -90,4 +92,4 @@ export const SkillsSection = ({
       </div>
     )}
   </section>
-)
+);
